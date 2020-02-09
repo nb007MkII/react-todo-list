@@ -19,11 +19,10 @@ class App extends Component {
     this.setState({ allTodos: sampleTodos, todos: sampleTodos });
   }
 
-  navBarBadgeClick(option) {
-    console.log(this);
+  navBarBadgeClick = option => {
+    //console.log(this);
 
-    /*
-      let todos = this.todos;
+    let todos = this.todos;
 
     switch (option) {
       case 1: {
@@ -41,8 +40,7 @@ class App extends Component {
     }
 
     this.setState({ todos });
-  */
-  }
+  };
 
   render() {
     return (
@@ -65,7 +63,7 @@ class App extends Component {
     );
   }
 
-  isToDoOverdue(todo) {
+  isToDoOverdue = todo => {
     if (
       todo &&
       (!todo.completed || todo.completed === false) &&
@@ -76,15 +74,15 @@ class App extends Component {
     }
 
     return false;
-  }
+  };
 
-  isToDoCompleted(todo) {
+  isToDoCompleted = todo => {
     if (todo && todo.completed && todo.completed === true) {
       return true;
     }
 
     return false;
-  }
+  };
 }
 
 export default App;
