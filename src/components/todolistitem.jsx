@@ -18,7 +18,11 @@ class ToDoListItem extends Component {
 
   renderDescription() {
     let jsx = [
-      <h5 key={"todolistitem_h5_" + this.props.todo.id} className="mb-1">
+      <h5
+        key={"todolistitem_h5_" + this.props.todo.id}
+        className="mb-1"
+        onClick={this.props.editTodo}
+      >
         {this.props.todo.description}
       </h5>
     ];

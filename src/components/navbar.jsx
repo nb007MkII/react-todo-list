@@ -21,7 +21,7 @@ class NavBar extends Component {
         <span
           key="navbar_totalbadge"
           className="badge badge-pill badge-secondary"
-          onClick={() => this.props.badgeClick(0)}
+          onClick={() => this.props.navBarBadgeClick(0)}
         >
           {totalCount}
         </span>
@@ -37,7 +37,7 @@ class NavBar extends Component {
             <span
               key="navbar_completedbadge"
               className="badge badge-pill badge-success"
-              onClick={() => this.props.badgeClick(1)}
+              onClick={() => this.props.navBarBadgeClick(1)}
             >
               {completedCount}
             </span>
@@ -53,7 +53,7 @@ class NavBar extends Component {
             <span
               key="navbar_overduebadge"
               className="badge badge-pill badge-danger"
-              onClick={() => this.props.badgeClick(2)}
+              onClick={() => this.props.navBarBadgeClick(2)}
             >
               {overdueCount}
             </span>

@@ -10,6 +10,7 @@ class ToDoList extends Component {
             <ToDoListItem
               key={m.id}
               todo={m}
+              editTodo={this.props.editTodo}
               isToDoCompleted={this.props.isToDoCompleted}
               isToDoOverdue={this.props.isToDoOverdue}
             ></ToDoListItem>

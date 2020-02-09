@@ -4,11 +4,13 @@ import "./App.css";
 import ToDoList from "./components/todolist";
 import SampleDataGenerator from "./SampleData";
 import NavBar from "./components/navbar";
+import ToDoEdit from "./components/todoedit";
 
 class App extends Component {
   state = {
     allTodos: [],
-    todos: []
+    todos: [],
+    editingId: -1
   };
 
   componentDidMount() {
@@ -47,19 +49,26 @@ class App extends Component {
   render() {
     return (
       <React.Fragment>
-        <NavBar
-          todos={this.state.todos}
-          isToDoCompleted={this.isToDoCompleted}
-          isToDoOverdue={this.isToDoOverdue}
-          badgeClick={this.navBarBadgeClick}
-          thisIsAPropOnNavBar={true}
-        ></NavBar>
         <main className="container">
-          <ToDoList
+          <NavBar
             todos={this.state.todos}
             isToDoCompleted={this.isToDoCompleted}
             isToDoOverdue={this.isToDoOverdue}
+            navBarBadgeClick={this.navBarBadgeClick}
+            thisIsAPropOnNavBar={true}
+          ></NavBar>
+          <ToDoList
+            todos={this.state.todos}
+            editTodo={this.editTodo}
+            isToDoCompleted={this.isToDoCompleted}
+            isToDoOverdue={this.isToDoOverdue}
           ></ToDoList>
+          <ToDoEdit
+            isOpen={
+              this.state.editingId && this.state.editingId > 0 ? true : true
+            }
+            editingId={this.state.editingId}
+          ></ToDoEdit>
         </main>
       </React.Fragment>
     );
