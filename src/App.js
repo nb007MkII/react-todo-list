@@ -21,8 +21,9 @@ class App extends Component {
 
     this.setState({
       allTodos: sampleTodos,
-      todos: displayTheseDodos,
-      editingTodo: null
+      todos: displayTheseDodos.todos,
+      currentFilterOption: displayTheseDodos.filterOption,
+      currentSortOrder: displayTheseDodos.sortOrder
     });
   }
 
@@ -94,7 +95,11 @@ class App extends Component {
       filterOption
     );
 
-    this.setState({ todos: displayTheseDodos });
+    this.setState({
+      todos: displayTheseDodos.todos,
+      currentFilterOption: displayTheseDodos.filterOption,
+      currentSortOrder: displayTheseDodos.sortOrder
+    });
   };
 
   /// get the todos to be displayed based on a passed in filter option (using constants defined at the bottom of this module)
@@ -206,13 +211,7 @@ class App extends Component {
       }
     }
 
-    // save current filter option and sort order to state
-    this.setState({
-      currentFilterOption: filterOption,
-      currentSortOrder: sortOrder
-    });
-
-    return todos;
+    return { todos, filterOption, sortOrder };
   };
 
   /// returns a boolean indicating whether a given ToDo is overdue
@@ -280,11 +279,13 @@ class App extends Component {
         allTodos.push(saveTodo);
       }
 
-      const displayTheseDodos = this.getDisplayTodos(allTodos, null);
+      const displayTheseDodos = this.getDisplayTodos(allTodos);
 
       this.setState({
         allTodos,
-        todos: displayTheseDodos,
+        todos: displayTheseDodos.todos,
+        currentFilterOption: displayTheseDodos.filterOption,
+        currentSortOrder: displayTheseDodos.sortOrder,
         editingTodo: null,
         deletingTodo: null
       });
@@ -309,11 +310,13 @@ class App extends Component {
   deleteTodo = deleteTodo => {
     if (deleteTodo && deleteTodo.id) {
       const newToDos = this.state.allTodos.filter(t => t.id !== deleteTodo.id);
-      const displayTheseDodos = this.getDisplayTodos(newToDos, null);
+      const displayTheseDodos = this.getDisplayTodos(newToDos);
 
       this.setState({
         allTodos: newToDos,
-        todos: displayTheseDodos,
+        todos: displayTheseDodos.todos,
+        currentFilterOption: displayTheseDodos.filterOption,
+        currentSortOrder: displayTheseDodos.sortOrder,
         editingTodo: null,
         deletingTodo: null
       });
@@ -331,7 +334,9 @@ class App extends Component {
 
       this.setState({
         allTodos: this.state.allTodos,
-        todos: displayTheseDodos,
+        todos: displayTheseDodos.todos,
+        currentFilterOption: displayTheseDodos.filterOption,
+        currentSortOrder: displayTheseDodos.sortOrder,
         editingTodo: null,
         deletingTodo: null
       });
