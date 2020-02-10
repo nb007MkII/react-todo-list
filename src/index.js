@@ -5,6 +5,9 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import "bootstrap/dist/css/bootstrap.css";
 //import "jquery/dist/core"
+import Modal from "react-modal";
+
+Modal.setAppElement(document.getElementById("root"));
 
 ReactDOM.render(<App />, document.getElementById("root"));
 

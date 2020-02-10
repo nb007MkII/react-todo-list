@@ -2,30 +2,27 @@ import React, { Component } from "react";
 import ToDoListItem from "./todolistitem";
 
 class ToDoList extends Component {
-  constructor(props) {
-    super(props);
-
-    console.log(props);
-  }
-
   render() {
     return (
-      <div>
+      <React.Fragment>
         <div className="list-group">
           {this.props.todos !== undefined ? (
             this.props.todos.map(m => (
               <ToDoListItem
                 key={m.id}
                 todo={m}
-                isToDoCompleted={this.props.isToDoCompleted}
                 isToDoOverdue={this.props.isToDoOverdue}
+                isToDoCompleted={this.props.isToDoCompleted}
+                isToDoHighDollarValue={this.props.isToDoHighDollarValue}
+                showEditModal={this.props.showEditModal}
+                showDeleteModal={this.props.showDeleteModal}
               ></ToDoListItem>
             ))
           ) : (
-            <span>No todos!</span>
+            <span>No ToDos!</span>
           )}
         </div>
-      </div>
+      </React.Fragment>
     );
   }
 }

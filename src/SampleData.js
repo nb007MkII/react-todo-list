@@ -2,26 +2,21 @@ class SampleDataGenerator {
   SampleData() {
     return [
       {
-        description: "aliquet nec, imperdiet nec, leo.",
-        dollarValue: 40,
+        description: "Write React Sample App",
+        dueDate: new Date("2020-02-13"),
+        dollarValue: 0,
         notes:
-          "tellus, imperdiet non, vestibulum nec, euismod in, dolor. Fusce feugiat. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam auctor,",
-        completed: true,
+          "Write a sample app in React that demonstrates CRUD operations for a list of ToDo items. Illustrate React DOM updates using filtering controls.  Use a modal for the edit form.",
+        completed: false,
         id: 1
       },
       {
-        description: "interdum. Nunc sollicitudin commodo",
-        notes:
-          "non justo. Proin non massa non ante bibendum ullamcorper. Duis cursus, diam at pretium aliquet, metus urna convallis erat, eget tincidunt dui",
+        description: "ante dictum mi, ac mattis velit justo nec",
+        dueDate: new Date("2021-01-16T06:39:57-08:00"),
+        dollarValue: 724,
+        notes: "volutpat nunc sit amet metus. Aliquam erat volutpat.",
         completed: false,
-        id: 2
-      },
-      {
-        description: "mi lacinia mattis. Integer eu lacus. Quisque imperdiet,",
-        notes:
-          "molestie. Sed id risus quis diam luctus lobortis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Mauris ut quam",
-        completed: true,
-        id: 3
+        id: 18
       },
       {
         description:
@@ -30,7 +25,8 @@ class SampleDataGenerator {
         notes:
           "suscipit nonummy. Fusce fermentum fermentum arcu. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Phasellus ornare. Fusce mollis. Duis sit",
         completed: false,
-        id: 4
+        id: 4,
+        color: "#ffff00"
       },
       {
         description: "neque pellentesque massa lobortis",
@@ -65,28 +61,33 @@ class SampleDataGenerator {
         id: 8
       },
       {
+        description: "aliquet nec, imperdiet nec, leo.",
+        dollarValue: 40,
+        notes:
+          "tellus, imperdiet non, vestibulum nec, euismod in, dolor. Fusce feugiat. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam auctor,",
+        completed: true,
+        id: 1
+      },
+      {
+        description: "interdum. Nunc sollicitudin commodo",
+        notes:
+          "non justo. Proin non massa non ante bibendum ullamcorper. Duis cursus, diam at pretium aliquet, metus urna convallis erat, eget tincidunt dui",
+        completed: false,
+        id: 2
+      },
+      {
+        description: "mi lacinia mattis. Integer eu lacus. Quisque imperdiet,",
+        notes:
+          "molestie. Sed id risus quis diam luctus lobortis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Mauris ut quam",
+        completed: true,
+        id: 3
+      },
+      {
         description: "mollis. Phasellus",
         dollarValue: 93,
         notes: "tincidunt dui augue eu tellus. Phasellus elit pede, malesuada",
         completed: false,
         id: 9
-      },
-      {
-        description:
-          "molestie arcu. Sed eu nibh vulputate mauris sagittis placerat.",
-        dueDate: new Date("2019-03-01T04:43:30-08:00"),
-        dollarValue: 293,
-        notes:
-          "fermentum vel, mauris. Integer sem elit, pharetra ut, pharetra sed, hendrerit a, arcu.",
-        completed: true,
-        id: 10
-      },
-      {
-        description: "Proin non massa non ante",
-        dueDate: new Date("2020-07-01T19:29:18-07:00"),
-        notes: "tincidunt orci quis lectus. Nullam suscipit, est ac",
-        completed: false,
-        id: 11
       },
       {
         description: "enim.",
@@ -130,21 +131,21 @@ class SampleDataGenerator {
         id: 16
       },
       {
-        description: "a sollicitudin orci sem eget",
-        dueDate: new Date("2020-01-23T12:01:29-08:00"),
-        dollarValue: 393,
+        description:
+          "molestie arcu. Sed eu nibh vulputate mauris sagittis placerat.",
+        dueDate: new Date("2019-03-01T04:43:30-08:00"),
+        dollarValue: 293,
         notes:
-          "tincidunt, neque vitae semper egestas, urna justo faucibus lectus, a sollicitudin",
-        completed: false,
-        id: 17
+          "fermentum vel, mauris. Integer sem elit, pharetra ut, pharetra sed, hendrerit a, arcu.",
+        completed: true,
+        id: 10
       },
       {
-        description: "ante dictum mi, ac mattis velit justo nec",
-        dueDate: new Date("2021-01-16T06:39:57-08:00"),
-        dollarValue: 724,
-        notes: "volutpat nunc sit amet metus. Aliquam erat volutpat.",
+        description: "Proin non massa non ante",
+        dueDate: new Date("2020-07-01T19:29:18-07:00"),
+        notes: "tincidunt orci quis lectus. Nullam suscipit, est ac",
         completed: false,
-        id: 18
+        id: 11
       }
     ];
   }
