@@ -19,6 +19,13 @@ class ToDoEditModal extends Component {
         shouldCloseOnOverlayClick={false}
         style={{ content: { bottom: "undefined" } }}
       >
+        <h5 key="modal_header">
+          {this.editingTodo
+            ? this.editingTodo.id
+              ? "Update Existing ToDo"
+              : "Create New ToDo"
+            : "error: this.editingTodo undefined"}
+        </h5>
         <div className="form-group">
           <label htmlFor="todoDescription">Description</label>
           <input
@@ -99,7 +106,7 @@ class ToDoEditModal extends Component {
         </button>
         <button
           className="btn btn-cancel"
-          onClick={() => this.props.cancelEdit()}
+          onClick={() => this.props.hideModals()}
         >
           Cancel
         </button>

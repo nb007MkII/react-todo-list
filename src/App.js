@@ -16,12 +16,12 @@ class App extends Component {
 
   componentDidMount() {
     const sampleDataGenerator = new SampleDataGenerator();
-
     const sampleTodos = sampleDataGenerator.SampleData();
+    const displayTheseDodos = this.getDisplayTodos(sampleTodos);
 
     this.setState({
       allTodos: sampleTodos,
-      todos: sampleTodos,
+      todos: displayTheseDodos,
       editingTodo: null
     });
   }
@@ -36,7 +36,8 @@ class App extends Component {
             isToDoOverdue={this.isToDoOverdue}
             isToDoHighDollarValue={this.isToDoHighDollarValue}
             navBarBadgeClick={this.navBarBadgeClick}
-            addButtonClick={this.addButtonClick}
+            showEditModal={this.showEditModal}
+            sortList={this.sortList}
           ></NavBar>
           <ToDoList
             todos={this.state.todos}
@@ -53,7 +54,7 @@ class App extends Component {
             }
             todo={this.state.editingTodo}
             saveEditTodo={this.saveEditTodo}
-            cancelEdit={this.cancelEdit}
+            hideModals={this.hideModals}
           ></ToDoEditModal>
           {/* The modal below is an in-line implementation of a modal */}
           <Modal
@@ -76,7 +77,7 @@ class App extends Component {
             </button>
             <button
               className="btn btn-cancel"
-              onClick={() => this.cancelEdit()}
+              onClick={() => this.hideModals()}
             >
               Nope, Do Not Delete
             </button>
@@ -87,28 +88,30 @@ class App extends Component {
   }
 
   /// click event handler for the badges in the nav bar
-  navBarBadgeClick = option => {
-    const displayTheseDodos = this.getDisplayTodos(this.state.allTodos, option);
-
-    console.log(displayTheseDodos);
+  navBarBadgeClick = filterOption => {
+    const displayTheseDodos = this.getDisplayTodos(
+      this.state.allTodos,
+      filterOption
+    );
 
     this.setState({ todos: displayTheseDodos });
   };
 
   /// get the todos to be displayed based on a passed in filter option (using constants defined at the bottom of this module)
   /// if option is null then state will be checked to see if there is a 'current' option
-  getDisplayTodos = (allTodos, option) => {
+  getDisplayTodos = (allTodos, filterOption, sortOrder) => {
     let todos = allTodos;
 
-    if (!option && option !== 0) {
-      option = this.state.currentOption;
+    // apply filter option
+    if (!filterOption && filterOption !== 0) {
+      filterOption = this.state.currentFilterOption;
     }
 
-    if (!option) {
-      option = displayOptionAll;
+    if (!filterOption) {
+      filterOption = displayOptionAll;
     }
 
-    switch (option) {
+    switch (filterOption) {
       case displayOptionCompleted: {
         todos = allTodos.filter(t => this.isToDoCompleted(t));
         break;
@@ -129,7 +132,85 @@ class App extends Component {
       }
     }
 
-    this.setState({ currentOption: option });
+    // apply sort
+    if (!sortOrder && sortOrder !== 0) {
+      sortOrder = this.state.currentSortOrder;
+    }
+
+    if (!sortOrder) {
+      sortOrder = sortOrderDueDate;
+    }
+
+    switch (sortOrder) {
+      case sortOrderDueDate:
+      case sortOrderDueDateDesc: {
+        todos.sort(function(a, b) {
+          let aa = a,
+            bb = b;
+
+          if (sortOrder === sortOrderDueDateDesc) {
+            aa = b;
+            bb = a;
+          }
+
+          return (
+            (aa.dueDate ? aa.dueDate.getTime() : 0) -
+            (bb.dueDate ? bb.dueDate.getTime() : 0)
+          );
+        });
+        break;
+      }
+      case sortOrderDollarValue:
+      case sortOrderDollarValueDesc: {
+        todos.sort(function(a, b) {
+          let aa = a,
+            bb = b;
+
+          if (sortOrder === sortOrderDollarValueDesc) {
+            aa = b;
+            bb = a;
+          }
+
+          return (
+            (aa.dollarValue ? aa.dollarValue : 0) -
+            (bb.dollarValue ? bb.dollarValue : 0)
+          );
+        });
+        break;
+      }
+      case sortOrderDescription:
+      case sortOrderDescriptionDesc: {
+        todos.sort(function(a, b) {
+          let aa = (a.description ? a.description : "").toUpperCase(),
+            bb = (b.description ? b.description : "").toUpperCase();
+
+          if (sortOrder === sortOrderDescriptionDesc) {
+            aa = (b.description ? b.description : "").toUpperCase();
+            bb = (a.description ? a.description : "").toUpperCase();
+          }
+
+          if (aa > bb) {
+            return 1;
+          }
+
+          if (aa < bb) {
+            return -1;
+          }
+
+          return 0;
+        });
+        break;
+      }
+      default: {
+        // shut up es lint
+      }
+    }
+
+    // save current filter option and sort order to state
+    this.setState({
+      currentFilterOption: filterOption,
+      currentSortOrder: sortOrder
+    });
 
     return todos;
   };
@@ -168,7 +249,7 @@ class App extends Component {
 
   /// shows the edit modal for a given ToDo
   showEditModal = todo => {
-    if (todo && todo.id) {
+    if (todo) {
       // open  modal
       this.setState({ editingTodo: todo, deletingTodo: null });
     }
@@ -190,7 +271,7 @@ class App extends Component {
         // generate a new id here since this demo is not backed by a database or api
         allTodos
           .sort(function(a, b) {
-            return a.id - b.id;
+            return a.id > b.id;
           })
           .reverse();
 
@@ -211,19 +292,9 @@ class App extends Component {
   };
 
   /// close modals without saving anything
-  cancelEdit = () => {
+  hideModals = () => {
     // close modal
     this.setState({ editingTodo: null, deletingTodo: null });
-  };
-
-  /// show the edit modal for a new ToDo
-  addButtonClick = () => {
-    const newToDo = {
-      description: "",
-      completed: false
-    };
-
-    this.setState({ editingTodo: newToDo, deletingTodo: null });
   };
 
   /// shows the edit modal for a given ToDo
@@ -248,11 +319,37 @@ class App extends Component {
       });
     }
   };
+
+  // sort the list of ToDos
+  sortList = sortOrder => {
+    if (sortOrder || sortOrder === 0) {
+      const displayTheseDodos = this.getDisplayTodos(
+        this.state.allTodos,
+        null,
+        sortOrder
+      );
+
+      this.setState({
+        allTodos: this.state.allTodos,
+        todos: displayTheseDodos,
+        editingTodo: null,
+        deletingTodo: null
+      });
+    }
+  };
 }
 
 export default App;
+
 export const displayOptionAll = 0;
 export const displayOptionCompleted = 1;
 export const displayOptionIncomplete = 2;
 export const displayOptionOverdue = 4;
 export const displayOptionHighDollarValue = 5;
+
+export const sortOrderDueDate = 0;
+export const sortOrderDueDateDesc = 1;
+export const sortOrderDollarValue = 2;
+export const sortOrderDollarValueDesc = 3;
+export const sortOrderDescription = 4;
+export const sortOrderDescriptionDesc = 5;

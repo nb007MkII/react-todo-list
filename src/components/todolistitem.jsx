@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Octicon, { Pencil, Trashcan } from "@primer/octicons-react";
+import Octicon, { Pencil, Trashcan, GitBranch } from "@primer/octicons-react";
 
 class ToDoListItem extends Component {
   render() {
@@ -28,6 +28,19 @@ class ToDoListItem extends Component {
           className="float-right"
         >
           <Octicon icon={Trashcan} />
+        </div>
+        <div
+          key={"todolistitem_clonebutton_" + this.props.todo.id}
+          onClick={() => {
+            const cloneToDo = { ...this.props.todo };
+
+            cloneToDo.id = null;
+
+            this.props.showEditModal(cloneToDo);
+          }}
+          className="float-right"
+        >
+          <Octicon icon={GitBranch} />
         </div>
         <div
           key={"todolistitem_editbutton_" + this.props.todo.id}

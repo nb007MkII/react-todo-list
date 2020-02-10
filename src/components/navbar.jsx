@@ -4,18 +4,53 @@ import {
   displayOptionCompleted,
   displayOptionIncomplete,
   displayOptionOverdue,
-  displayOptionHighDollarValue
+  displayOptionHighDollarValue,
+  sortOrderDueDate,
+  sortOrderDueDateDesc,
+  sortOrderDollarValue,
+  sortOrderDollarValueDesc,
+  sortOrderDescription,
+  sortOrderDescriptionDesc
 } from "../App";
 import Octicon, { Plus } from "@primer/octicons-react";
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
 
 class NavBar extends Component {
   render() {
+    const sortOrders = [
+      { desc: "By Due Date", val: sortOrderDueDate },
+      { desc: "By Due Date Reverse", val: sortOrderDueDateDesc },
+      { desc: "By Dollar Value", val: sortOrderDollarValue },
+      { desc: "By Dollar Value Reverse", val: sortOrderDollarValueDesc },
+      { desc: "By Description", val: sortOrderDescription },
+      { desc: "By Description Reverse", val: sortOrderDescriptionDesc }
+    ];
+
     return (
       <nav className="navbar navbar-light bg-light">
-        <a className="navbar-brand" href="#">
+        <div className="navbar-brand" style={{ userSelect: "none" }}>
           ToDo List {this.renderPills()}
-        </a>
-        <div key="createNewToDoBtn" onClick={() => this.props.addButtonClick()}>
+        </div>
+        <DropdownButton id="dropdown-item-button" title="Sort">
+          {sortOrders.map(so => (
+            <Dropdown.Item
+              key={"sort_order_item_" + so.val}
+              as="button"
+              onClick={() => {
+                this.props.sortList(so.val);
+              }}
+            >
+              {so.desc}
+            </Dropdown.Item>
+          ))}
+        </DropdownButton>
+        <div
+          key="createNewToDoBtn"
+          onClick={() => {
+            this.props.showEditModal({ completed: false });
+          }}
+        >
           <Octicon icon={Plus} />
         </div>
       </nav>

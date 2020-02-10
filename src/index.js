@@ -3,8 +3,7 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
-import "bootstrap/dist/css/bootstrap.css";
-//import "jquery/dist/core"
+import "bootstrap/dist/css/bootstrap.min.css";
 import Modal from "react-modal";
 
 Modal.setAppElement(document.getElementById("root"));
