@@ -2,29 +2,19 @@ import React, { Component } from "react";
 //import logo from './logo.svg';
 import "./App.css";
 import ToDoList from "./components/todolist";
-import SampleDataGenerator from "./SampleData";
 import NavBar from "./components/navbar";
 import ToDoEditModal from "./components/todoeditmodal";
 import Modal from "react-modal";
 
 class App extends Component {
   state = {
-    allTodos: [],
     todos: [],
+    summaries: [],
     editingTodo: null
   };
 
   componentDidMount() {
-    const sampleDataGenerator = new SampleDataGenerator();
-    const sampleTodos = sampleDataGenerator.SampleData();
-    const displayTheseDodos = this.getDisplayTodos(sampleTodos);
-
-    this.setState({
-      allTodos: sampleTodos,
-      todos: displayTheseDodos.todos,
-      currentFilterOption: displayTheseDodos.filterOption,
-      currentSortOrder: displayTheseDodos.sortOrder
-    });
+    this.getToDos();
   }
 
   render() {
@@ -32,13 +22,14 @@ class App extends Component {
       <React.Fragment>
         <main className="container">
           <NavBar
-            todos={this.state.allTodos}
             isToDoCompleted={this.isToDoCompleted}
             isToDoOverdue={this.isToDoOverdue}
             isToDoHighDollarValue={this.isToDoHighDollarValue}
             navBarBadgeClick={this.navBarBadgeClick}
             showEditModal={this.showEditModal}
+            currentSortOrder={this.state.currentSortOrder}
             sortList={this.sortList}
+            summaries={this.state.summaries}
           ></NavBar>
           <ToDoList
             todos={this.state.todos}
@@ -66,7 +57,8 @@ class App extends Component {
             style={{ content: { bottom: "undefined" } }}
           >
             <p>
-              Id: {this.state.deletingTodo ? this.state.deletingTodo.id : ""}
+              Id:{" "}
+              {this.state.deletingTodo ? this.state.deletingTodo.todoid : ""}
             </p>
             <p>Are you sure you want to delete this ToDo?</p>
             <button
@@ -90,54 +82,11 @@ class App extends Component {
 
   /// click event handler for the badges in the nav bar
   navBarBadgeClick = filterOption => {
-    const displayTheseDodos = this.getDisplayTodos(
-      this.state.allTodos,
-      filterOption
-    );
-
-    this.setState({
-      todos: displayTheseDodos.todos,
-      currentFilterOption: displayTheseDodos.filterOption,
-      currentSortOrder: displayTheseDodos.sortOrder
-    });
+    this.getToDos(filterOption);
   };
 
-  /// get the todos to be displayed based on a passed in filter option (using constants defined at the bottom of this module)
-  /// if option is null then state will be checked to see if there is a 'current' option
-  getDisplayTodos = (allTodos, filterOption, sortOrder) => {
-    let todos = allTodos;
-
-    // apply filter option
-    if (!filterOption && filterOption !== 0) {
-      filterOption = this.state.currentFilterOption;
-    }
-
-    if (!filterOption) {
-      filterOption = displayOptionAll;
-    }
-
-    switch (filterOption) {
-      case displayOptionCompleted: {
-        todos = allTodos.filter(t => this.isToDoCompleted(t));
-        break;
-      }
-      case displayOptionIncomplete: {
-        todos = allTodos.filter(t => !this.isToDoCompleted(t));
-        break;
-      }
-      case displayOptionOverdue: {
-        todos = allTodos.filter(t => this.isToDoOverdue(t));
-        break;
-      }
-      case displayOptionHighDollarValue: {
-        todos = allTodos.filter(t => this.isToDoHighDollarValue(t));
-        break;
-      }
-      default: {
-      }
-    }
-
-    // apply sort
+  /// sort the passed-in array of ToDos
+  sortTodos = (todos, sortOrder) => {
     if (!sortOrder && sortOrder !== 0) {
       sortOrder = this.state.currentSortOrder;
     }
@@ -211,7 +160,7 @@ class App extends Component {
       }
     }
 
-    return { todos, filterOption, sortOrder };
+    return { todos, sortOrder };
   };
 
   /// returns a boolean indicating whether a given ToDo is overdue
@@ -257,38 +206,26 @@ class App extends Component {
   // saves the passed-in ToDo back to the state. used in both Creates and Updates.
   saveEditTodo = saveTodo => {
     if (saveTodo) {
-      const allTodos = [...this.state.allTodos];
+      let verb = "post";
 
-      if (saveTodo.id) {
-        // updating existing todo
-        const thisTodo = allTodos.find(t => t.id === saveTodo.id);
-        const index = allTodos.indexOf(thisTodo);
-
-        allTodos[index] = { ...saveTodo };
-      } else {
-        // adding a new todo
-        // generate a new id here since this demo is not backed by a database or api
-        allTodos
-          .sort(function(a, b) {
-            return a.id > b.id;
-          })
-          .reverse();
-
-        saveTodo.id = allTodos[0] + 1;
-
-        allTodos.push(saveTodo);
+      if (saveTodo.todoid) {
+        // updating an existing todo
+        verb = "put";
       }
 
-      const displayTheseDodos = this.getDisplayTodos(allTodos);
-
-      this.setState({
-        allTodos,
-        todos: displayTheseDodos.todos,
-        currentFilterOption: displayTheseDodos.filterOption,
-        currentSortOrder: displayTheseDodos.sortOrder,
-        editingTodo: null,
-        deletingTodo: null
-      });
+      fetch("https://localhost:44312/api/todos/", {
+        method: verb,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(saveTodo)
+      })
+        .then(() => {
+          this.getToDos();
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
   };
 
@@ -300,7 +237,7 @@ class App extends Component {
 
   /// shows the edit modal for a given ToDo
   showDeleteModal = todo => {
-    if (todo && todo.id) {
+    if (todo && todo.todoid) {
       // open  modal
       this.setState({ deletingTodo: todo, editingTodo: null });
     }
@@ -308,12 +245,25 @@ class App extends Component {
 
   /// delete the passed-in ToDo from state
   deleteTodo = deleteTodo => {
-    if (deleteTodo && deleteTodo.id) {
-      const newToDos = this.state.allTodos.filter(t => t.id !== deleteTodo.id);
-      const displayTheseDodos = this.getDisplayTodos(newToDos);
+    if (deleteTodo && deleteTodo.todoid) {
+      fetch("https://localhost:44312/api/todos/" + deleteTodo.todoid, {
+        method: "delete"
+      })
+        .then(() => {
+          this.getToDos();
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
+  };
+
+  // sort the current list of ToDos (called from NavBar)
+  sortList = sortOrder => {
+    if (sortOrder || sortOrder === 0) {
+      const displayTheseDodos = this.sortTodos(this.state.todos, sortOrder);
 
       this.setState({
-        allTodos: newToDos,
         todos: displayTheseDodos.todos,
         currentFilterOption: displayTheseDodos.filterOption,
         currentSortOrder: displayTheseDodos.sortOrder,
@@ -323,34 +273,48 @@ class App extends Component {
     }
   };
 
-  // sort the list of ToDos
-  sortList = sortOrder => {
-    if (sortOrder || sortOrder === 0) {
-      const displayTheseDodos = this.getDisplayTodos(
-        this.state.allTodos,
-        null,
-        sortOrder
-      );
-
-      this.setState({
-        allTodos: this.state.allTodos,
-        todos: displayTheseDodos.todos,
-        currentFilterOption: displayTheseDodos.filterOption,
-        currentSortOrder: displayTheseDodos.sortOrder,
-        editingTodo: null,
-        deletingTodo: null
-      });
+  // get ToDos from API and display them
+  getToDos = filterOption => {
+    if (!filterOption && filterOption !== 0) {
+      filterOption = this.state.currentFilterOption;
     }
+
+    if (!filterOption) {
+      filterOption = filterOptionAll;
+    }
+
+    fetch("https://localhost:44312/api/todos?filteroption=" + filterOption)
+      .then(response => response.json())
+      .then(apiResponse => {
+        // hacky fix to change deserialized json date strings into js dates
+        apiResponse.toDos.forEach(t => {
+          t.dueDate = t.dueDate ? new Date(t.dueDate) : null;
+        });
+
+        const displayTheseDodos = this.sortTodos(apiResponse.toDos);
+
+        this.setState({
+          todos: displayTheseDodos.todos,
+          summaries: apiResponse.summaries,
+          currentFilterOption: filterOption,
+          currentSortOrder: displayTheseDodos.sortOrder,
+          editingTodo: null,
+          deletingTodo: null
+        });
+      })
+      .catch(error => {
+        console.log(error);
+      });
   };
 }
 
 export default App;
 
-export const displayOptionAll = 0;
-export const displayOptionCompleted = 1;
-export const displayOptionIncomplete = 2;
-export const displayOptionOverdue = 4;
-export const displayOptionHighDollarValue = 5;
+export const filterOptionAll = 0;
+export const filterOptionCompleted = 1;
+export const filterOptionIncomplete = 2;
+export const filterOptionOverdue = 4;
+export const filterOptionHighDollarValue = 5;
 
 export const sortOrderDueDate = 0;
 export const sortOrderDueDateDesc = 1;

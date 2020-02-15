@@ -6,10 +6,10 @@ class ToDoList extends Component {
     return (
       <React.Fragment>
         <div className="list-group">
-          {this.props.todos !== undefined ? (
+          {this.props.todos !== undefined && this.props.todos.length > 0 ? (
             this.props.todos.map(m => (
               <ToDoListItem
-                key={m.id}
+                key={m.todoid}
                 todo={m}
                 isToDoOverdue={this.props.isToDoOverdue}
                 isToDoCompleted={this.props.isToDoCompleted}
@@ -19,7 +19,7 @@ class ToDoList extends Component {
               ></ToDoListItem>
             ))
           ) : (
-            <span>No ToDos!</span>
+            <span id={"notodos"}>No ToDos!</span>
           )}
         </div>
       </React.Fragment>
