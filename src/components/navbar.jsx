@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import {
-  displayOptionAll,
-  displayOptionCompleted,
-  displayOptionIncomplete,
-  displayOptionOverdue,
-  displayOptionHighDollarValue,
+  filterOptionAll,
+  filterOptionCompleted,
+  filterOptionIncomplete,
+  filterOptionOverdue,
+  filterOptionHighDollarValue,
   sortOrderDueDate,
   sortOrderDueDateDesc,
   sortOrderDollarValue,
@@ -12,7 +12,7 @@ import {
   sortOrderDescription,
   sortOrderDescriptionDesc
 } from "../App";
-import Octicon, { Plus } from "@primer/octicons-react";
+import Octicon, { Plus, TriangleRight } from "@primer/octicons-react";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 
@@ -41,6 +41,7 @@ class NavBar extends Component {
                 this.props.sortList(so.val);
               }}
             >
+              {this.renderCurrentSortOrder(so.val)}
               {so.desc}
             </Dropdown.Item>
           ))}
@@ -57,17 +58,40 @@ class NavBar extends Component {
     );
   }
 
+  renderCurrentSortOrder(thisSortOrder) {
+    if (thisSortOrder === this.props.currentSortOrder) {
+      return (
+        <React.Fragment>
+          <Octicon icon={TriangleRight} />
+        </React.Fragment>
+      );
+    }
+
+    return <React.Fragment></React.Fragment>;
+  }
+
   renderPills() {
     let jsx = [];
 
-    if (this.props.todos) {
-      const totalCount = this.props.todos.length;
+    console.log("renderPills: this.props.summaries", this.props.summaries);
+
+    if (this.props.summaries) {
+      let summaryItem = this.props.summaries.find(
+        s => s.filterOption === filterOptionAll
+      );
+      let totalCount = 0;
+
+      console.log("renderPills: summaryItem", summaryItem);
+
+      if (summaryItem && summaryItem.totalToDos) {
+        totalCount = summaryItem.totalToDos;
+      }
 
       jsx.push(
         <span
           key="navbar_totalbadge"
           className="badge badge-pill badge-secondary"
-          onClick={() => this.props.navBarBadgeClick(displayOptionAll)}
+          onClick={() => this.props.navBarBadgeClick(filterOptionAll)}
         >
           {totalCount} Total
         </span>
@@ -75,84 +99,98 @@ class NavBar extends Component {
 
       if (totalCount > 0) {
         // overdue
-        const overdueCount = this.props.todos.filter(t =>
-          this.props.isToDoOverdue(t)
-        ).length;
+        summaryItem = this.props.summaries.find(
+          s => s.filterOption === filterOptionOverdue
+        );
 
-        if (overdueCount > 0) {
+        if (
+          summaryItem &&
+          summaryItem.totalToDos &&
+          summaryItem.totalToDos > 0
+        ) {
           jsx.push(
             <React.Fragment key="navbar_overduebadge">
               <span>&nbsp;</span>
               <span
                 className="badge badge-pill badge-danger"
-                onClick={() =>
-                  this.props.navBarBadgeClick(displayOptionOverdue)
-                }
+                onClick={() => this.props.navBarBadgeClick(filterOptionOverdue)}
               >
-                {overdueCount} Overdue
+                {summaryItem.totalToDos} Overdue
               </span>
             </React.Fragment>
           );
         }
 
         // incomplete
-        const incompleteCount = this.props.todos.filter(
-          t => !this.props.isToDoCompleted(t)
-        ).length;
+        summaryItem = this.props.summaries.find(
+          s => s.filterOption === filterOptionIncomplete
+        );
 
-        if (incompleteCount > 0) {
+        if (
+          summaryItem &&
+          summaryItem.totalToDos &&
+          summaryItem.totalToDos > 0
+        ) {
           jsx.push(
             <React.Fragment key="navbar_incompletebadge">
               <span>&nbsp;</span>
               <span
                 className="badge badge-pill badge-info"
                 onClick={() =>
-                  this.props.navBarBadgeClick(displayOptionIncomplete)
+                  this.props.navBarBadgeClick(filterOptionIncomplete)
                 }
               >
-                {incompleteCount} Not Completed
+                {summaryItem.totalToDos} Not Completed
               </span>
             </React.Fragment>
           );
         }
 
         // high dollar value
-        const highDollarValueCount = this.props.todos.filter(t =>
-          this.props.isToDoHighDollarValue(t)
-        ).length;
+        summaryItem = this.props.summaries.find(
+          s => s.filterOption === filterOptionHighDollarValue
+        );
 
-        if (highDollarValueCount > 0) {
+        if (
+          summaryItem &&
+          summaryItem.totalToDos &&
+          summaryItem.totalToDos > 0
+        ) {
           jsx.push(
             <React.Fragment key="navbar_highdollarvaluebadge">
               <span>&nbsp;</span>
               <span
                 className="badge badge-pill badge-success"
                 onClick={() =>
-                  this.props.navBarBadgeClick(displayOptionHighDollarValue)
+                  this.props.navBarBadgeClick(filterOptionHighDollarValue)
                 }
               >
-                {highDollarValueCount} $$$
+                {summaryItem.totalToDos} $$$
               </span>
             </React.Fragment>
           );
         }
 
         // complete
-        const completedCount = this.props.todos.filter(t =>
-          this.props.isToDoCompleted(t)
-        ).length;
+        summaryItem = this.props.summaries.find(
+          s => s.filterOption === filterOptionCompleted
+        );
 
-        if (completedCount > 0) {
+        if (
+          summaryItem &&
+          summaryItem.totalToDos &&
+          summaryItem.totalToDos > 0
+        ) {
           jsx.push(
             <React.Fragment key="navbar_completedbadge">
               <span>&nbsp;</span>
               <span
                 className="badge badge-pill badge-primary"
                 onClick={() =>
-                  this.props.navBarBadgeClick(displayOptionCompleted)
+                  this.props.navBarBadgeClick(filterOptionCompleted)
                 }
               >
-                {completedCount} Completed
+                {summaryItem.totalToDos} Completed
               </span>
             </React.Fragment>
           );
